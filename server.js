@@ -15,7 +15,7 @@ app.use(
     origin: [
       "http://127.0.0.1:5500",
       "http://localhost:5173",
-      "https://68caf6ceddf3e51b670432d1--cards-pro.netlify.app",
+      "https://cards-pro.netlify.app",
     ],
   })
 );
