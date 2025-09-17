@@ -1,0 +1,14 @@
+{
+  "TOKEN_GENERATOR": "jwt",
+  "LOGGER": "morgan",
+  "VALIDATOR": "joi",
+  "DB_ENVIRONMENT": "local",
+  "db": {
+    "local": {
+      "uri": "${LOCAL_DB}"
+    },
+    "atlas": {
+      "uri": "${ATLAS_DB}"
+    }
+  }
+}
