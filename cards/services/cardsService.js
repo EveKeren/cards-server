@@ -7,6 +7,12 @@ import {
   updateCardInDb,
 } from "./cardsDataService.js";
 
+// Generate unique business number for card
+const generateBizNumber = () => {
+  // Generate a 7-digit random business number
+  return Math.floor(1000000 + Math.random() * 9000000);
+};
+
 //get all
 export const getAllCards = async () => {
   const cards = await getAllCardsFromDb();
@@ -42,6 +48,10 @@ export const updateCard = async (id, newCard) => {
 
 //delete
 export const deleteCard = async (id) => {
+  const card = await getCardByIdFromDb(id);
+  if (!card) {
+    return null;
+  }
   const idOfDeletedCard = await deleteCardInDb(id);
   return idOfDeletedCard;
 };
