@@ -1,75 +1,41 @@
-import express from "express";
-import {
-  createNewCard,
-  deleteCard,
-  getAllCards,
-  getCardById,
-  updateCard,
-} from "../services/cardsService.js";
-import { auth } from "../../auth/services/authService.js";
-import { getCardByIdFromDb } from "../services/cardsDataService.js";
+router.patch("/:id", auth, async (req, res) => {
+  try {
+    const cardId = req.params.id;
+    const userId = req.user._id; // From auth middleware
 
-const router = express.Router();
+    // Use your existing cardsService
+    const card = await getCardById(cardId);
+    if (!card) {
+      return res.status(404).json({ message: "Card not found" });
+    }
 
-router.get("/", async (req, res) => {
-  const allCards = await getAllCards();
-  if (allCards) {
-    res.send(allCards);
-  } else {
-    res.status(500).send("something went wrong with get all cards");
-  }
-});
-router.post("/", auth, async (req, res) => {
-  const newCard = req.body;
-  const user = req.user;
-  if (!user.isBusiness) {
-    return res.status(403).send("Only business user can create cards");
-  }
-  const cardResult = await createNewCard(newCard, user._id);
-  if (cardResult) {
-    res.status(201).send("New card added successfully");
-  } else {
-    res.status(400).send("something went wrong with card creation");
-  }
-});
+    // Initialize likes array if it doesn't exist
+    if (!card.likes) {
+      card.likes = [];
+    }
 
-router.get("/:id", async (req, res) => {
-  const { id } = req.params;
-  const card = await getCardById(id);
-  if (card) {
-    res.send(card);
-  } else {
-    res.status(404).send("Card not found");
+    // Check if user already liked this card
+    const likeIndex = card.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
+
+    if (likeIndex > -1) {
+      // User already liked - remove like
+      card.likes.splice(likeIndex, 1);
+    } else {
+      // User hasn't liked - add like
+      card.likes.push(userId);
+    }
+
+    // Save the updated card using your existing updateCard function
+    const updatedCard = await updateCard(cardId, card);
+    res.json(updatedCard);
+  } catch (error) {
+    console.error("Toggle like error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-router.delete("/:id", auth, async (req, res) => {
-  const { id } = req.params;
-  const user = req.user;
-  //בדיקה אם המשתמש הוא אדמין או הבעלים של הכרטיס?
-  const card = await getCardByIdFromDb(id);
-  if (!user.isAdmin && card.user_id !== user._id) {
-    return res
-      .status(403)
-      .send("Only Admin user Or owner of card can delete it");
-  }
-  const idOfDeletedCard = await deleteCard(id);
-  if (idOfDeletedCard) {
-    res.send("Card deleted successfully");
-  } else {
-    res.status(400).send("something went wrong with card delete");
-  }
-});
-
-router.put("/:id", async (req, res) => {
-  const { id } = req.params;
-  const newCard = req.body;
-  const modifiedCard = await updateCard(id, newCard);
-  if (modifiedCard) {
-    res.send(modifiedCard);
-  } else {
-    res.status(400).send("something went wrong with card edit");
-  }
-});
-
-export default router;
+// Make sure to import the required functions at the top:
+// import { getCardById, updateCard } from '../services/cardsService.js';
+// import { auth } from '../../auth/services/authService.js';

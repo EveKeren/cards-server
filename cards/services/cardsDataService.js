@@ -22,6 +22,17 @@ export const getCardByIdFromDb = async (id) => {
   }
 };
 
+//get cards by user id - ADD THIS NEW FUNCTION
+export const getCardsByUserIdFromDb = async (userId) => {
+  try {
+    const cards = await Card.find({ user_id: userId });
+    return cards;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 //create
 export const createCard = async (card) => {
   try {

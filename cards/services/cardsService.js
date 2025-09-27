@@ -5,6 +5,7 @@ import {
   getAllCardsFromDb,
   getCardByIdFromDb,
   updateCardInDb,
+  getCardsByUserIdFromDb, // Add this import if it doesn't exist
 } from "./cardsDataService.js";
 
 // Generate unique business number for card
@@ -25,12 +26,21 @@ export const getCardById = async (id) => {
   return card;
 };
 
+// ADD THIS NEW FUNCTION - Get user's cards
+export const getMyCards = async (userId) => {
+  const cards = await getCardsByUserIdFromDb(userId);
+  return cards;
+};
+
 //create
 export const createNewCard = async (card, userId) => {
   //generate biznumber for the card
-  //it will look like this:
   card.bizNumber = generateBizNumber();
   card.user_id = userId;
+
+  // ADD THIS - Initialize likes array for new cards
+  card.likes = [];
+
   const { error } = validateCard(card);
   if (error) {
     console.log(error.details[0].message);
@@ -56,6 +66,6 @@ export const deleteCard = async (id) => {
   return idOfDeletedCard;
 };
 
-//toggleLike
+//toggleLike - IMPLEMENTATION NOT NEEDED (handled in controller)
 
 //changeBizNumber
