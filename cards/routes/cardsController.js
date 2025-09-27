@@ -33,7 +33,16 @@ router.get("/my-cards", auth, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
+router.get("/favorite-cards", auth, async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const favoriteCards = await getFavoriteCards(userId);
+    res.json(favoriteCards);
+  } catch (error) {
+    console.error("Get favorite cards error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 // GET /cards/:id - Get card by ID
 router.get("/:id", async (req, res) => {
   try {

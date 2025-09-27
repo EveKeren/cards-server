@@ -66,6 +66,7 @@ export const deleteCard = async (id) => {
   return idOfDeletedCard;
 };
 
-//toggleLike - IMPLEMENTATION NOT NEEDED (handled in controller)
-
-//changeBizNumber
+export const getFavoriteCards = async (userId) => {
+  const cards = await getFavoriteCardsFromDb(userId);
+  return cards;
+};

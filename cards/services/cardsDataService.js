@@ -79,3 +79,12 @@ export const getCardByBizNumber = async (bizNumber) => {
     return null;
   }
 };
+export const getFavoriteCardsFromDb = async (userId) => {
+  try {
+    const cards = await Card.find({ likes: userId });
+    return cards;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
