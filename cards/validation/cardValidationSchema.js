@@ -40,5 +40,6 @@ const cardSchema = Joi.object({
     .required(),
   bizNumber: Joi.number().allow(""),
   user_id: Joi.string().allow(""),
+  likes: Joi.array().items(Joi.string()).default([]).optional(),
 });
 export default cardSchema;
