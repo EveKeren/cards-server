@@ -6,6 +6,7 @@ import { createInitialData } from "./DB/initialData/initialDataService.js";
 import chalk from "chalk";
 import dotenv from "dotenv";
 import serverLogger from "./middlewares/loggerService.js";
+import { fileLogger } from "./middlewares/fileLogger.js";
 
 const app = express();
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(fileLogger);
 app.use(serverLogger);
 app.use(express.static("./public"));
 
