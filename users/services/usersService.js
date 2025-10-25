@@ -12,6 +12,11 @@ import {
   validateUser,
   validateUserUpdate,
 } from "../validation/userValidationService.js";
+import {
+  recordFailedAttempt,
+  resetLoginAttempts,
+  isBlocked,
+} from "./loginAttemptsService.js";
 import _ from "lodash";
 
 export const createNewUser = async (user) => {
@@ -41,11 +46,27 @@ export const createNewUser = async (user) => {
 
 export const login = async (email, password) => {
   try {
+    const blockStatus = isBlocked(email);
+    if (blockStatus.blocked) {
+      throw new Error(blockStatus.message);
+    }
+
     const user = await getUserByEmail(email);
+
     if (comparePassword(password, user?.password)) {
+      resetLoginAttempts(email);
       return generateToken(user);
     }
-    throw new Error("Password incorrect");
+
+    const attemptResult = recordFailedAttempt(email);
+
+    if (attemptResult.blocked) {
+      throw new Error(attemptResult.message);
+    }
+
+    throw new Error(
+      `Password incorrect. ${attemptResult.remainingAttempts} attempts remaining.`
+    );
   } catch (error) {
     throw new Error(error.message);
   }
