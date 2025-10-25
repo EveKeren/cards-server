@@ -1,11 +1,12 @@
 import express from "express";
-import logger from "./middlewares/logger.js";
 import router from "./router/router.js";
 import cors from "cors";
 import { connectToDb } from "./DB/dbService.js";
+import { createInitialData } from "./DB/initialData/initialDataService.js";
 import chalk from "chalk";
 import dotenv from "dotenv";
 import serverLogger from "./middlewares/loggerService.js";
+
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 3000;
@@ -23,17 +24,20 @@ app.use(
 app.use(express.json());
 app.use(serverLogger);
 app.use(express.static("./public"));
+
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
+
 app.use(router);
 
 app.use((error, req, res, next) => {
   console.log(error);
-  res.status(500).send("server internal error");
+  res.status(500).send("Server internal error");
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(chalk.blueBright(`Listening on: http://localhost:${port}`));
-  connectToDb();
+  await connectToDb();
+  await createInitialData();
 });
